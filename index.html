@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Excel Tutor — Live Coach</title>
+<meta name="description" content="A live AI-powered Excel coach that teaches you from beginner to intermediate." />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#1E5F4A" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="icon" href="icon-192.png" />
+<link rel="stylesheet" href="styles.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ Formula bar (top status strip) ============ -->
+  <div class="formula-bar">
+    <span class="cell-ref" id="cellRef">A1</span>
+    <span class="fx-icon">fx</span>
+    <span class="breadcrumb" id="breadcrumb">Learn &gt; Pick a topic to start</span>
+    <span class="level-pill" id="levelPill">Beginner</span>
+    <button class="gear-btn" id="gearBtn" title="Settings" aria-label="Settings">&#9881;</button>
+  </div>
+
+  <!-- ============ Onboarding (Groq API key setup) ============ -->
+  <main id="onboardView">
+    <div class="onboard-card">
+      <h2>Set up your Excel Tutor</h2>
+      <p>
+        This tutor is powered live by Groq's API — nothing is pre-written. Every lesson, tip, and
+        quiz question is generated for you in the moment, based on where you are and what you ask.
+      </p>
+      <p>
+        Groq gives a free API key with no credit card. Grab one at
+        <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>,
+        then paste it below. It's stored only on this device.
+      </p>
+      <input type="password" id="apiKeyInput" placeholder="gsk_..." autocomplete="off" />
+      <button class="btn btn-primary" id="saveKeyBtn">Start learning</button>
+    </div>
+  </main>
+
+  <!-- ============ Main app (hidden until key is set) ============ -->
+  <main id="mainView" class="hidden">
+
+    <!-- ---- Learn tab ---- -->
+    <section id="learnPanel">
+      <div class="brand-row">
+        <div class="brand">Excel<span>Tutor</span></div>
+      </div>
+      <div class="subtitle">Pick any topic — the lesson and quiz are generated live, tailored to your level.</div>
+      <div id="skillTree"></div>
+    </section>
+
+    <!-- ---- Chat / lesson thread tab ---- -->
+    <section id="chatPanel" class="hidden">
+      <div class="thread" id="thread">
+        <div class="empty-state">Ask anything about Excel, or pick a topic from Learn to begin a guided lesson.</div>
+      </div>
+    </section>
+
+    <!-- ---- Progress tab ---- -->
+    <section id="progressPanel" class="hidden">
+      <div class="brand-row"><div class="brand">Your progress</div></div>
+      <div class="progress-hero">
+        <div class="unit-title" style="margin-bottom:0;">Beginner → Intermediate</div>
+        <div class="progress-track"><div class="progress-fill" id="levelFill" style="width:0%"></div></div>
+        <div class="subtitle" style="margin:0;" id="levelText">0 of 0 topics mastered</div>
+        <div class="stat-row">
+          <div class="stat"><div class="num" id="statTopics">0</div><div class="lbl">Topics done</div></div>
+          <div class="stat"><div class="num" id="statStreak">0</div><div class="lbl">Day streak</div></div>
+          <div class="stat"><div class="num" id="statQuiz">0%</div><div class="lbl">Quiz accuracy</div></div>
+        </div>
+      </div>
+      <div id="progressList"></div>
+      <div id="weakSpotsBlock" class="hidden">
+        <div class="unit-title">Worth revisiting</div>
+        <div id="weakSpotsList" class="weak-spots-list"></div>
+        <button class="btn btn-primary" id="reviewWeakBtn">Review weak spots with tutor</button>
+      </div>
+      <button class="btn btn-ghost" id="resetProgressBtn">Reset progress</button>
+    </section>
+  </main>
+
+  <!-- ============ Composer (formula-bar styled chat input) ============ -->
+  <div class="composer hidden" id="composer">
+    <div class="composer-row">
+      <span class="fx-icon">fx</span>
+      <textarea id="chatInput" rows="1" placeholder="Ask your tutor anything about Excel…"></textarea>
+      <button class="send-btn" id="sendBtn" disabled>&#8594;</button>
+    </div>
+  </div>
+
+  <!-- ============ Bottom sheet-tab navigation ============ -->
+  <nav class="sheet-tabs hidden" id="sheetTabs">
+    <div class="sheet-tab active" data-tab="learn">Learn</div>
+    <div class="sheet-tab" data-tab="chat">Chat</div>
+    <div class="sheet-tab" data-tab="progress">Progress</div>
+  </nav>
+
+  <!-- ============ Settings modal ============ -->
+  <div class="modal-overlay hidden" id="settingsOverlay">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Settings</h3>
+        <button class="modal-close" id="settingsClose" aria-label="Close">&times;</button>
+      </div>
+      <div id="settingsBackendMode" class="settings-mode-note"></div>
+      <div id="settingsKeyRow">
+        <label class="settings-label" for="apiKeyInputSettings">Groq API key</label>
+        <input type="password" id="apiKeyInputSettings" placeholder="gsk_..." autocomplete="off" />
+        <button class="btn btn-primary" id="saveKeySettingsBtn">Save key</button>
+      </div>
+      <button class="btn btn-ghost" id="forgetKeyBtn">Forget key &amp; sign out</button>
+    </div>
+  </div>
+
+</div>
+<script src="config.js"></script>
+<script src="formula-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

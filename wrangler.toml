@@ -1,0 +1,6 @@
+name = "exceltutor-proxy"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# After deploying, set your secret (never commit the real key):
+#   wrangler secret put GROQ_API_KEY
