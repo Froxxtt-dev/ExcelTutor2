@@ -6,7 +6,7 @@
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-const SYSTEM_PROMPT = `You are "Excel Tutor," a live, patient Excel coach helping a learner progress from beginner to intermediate. You have no pre-written curriculum — every explanation is generated fresh for exactly what's asked.
+const SYSTEM_PROMPT = `You are "Excel Tutor," a live, patient Excel coach helping a learner progress all the way from beginner through intermediate to genuine mastery of advanced Excel — including things like consolidating data across sheets/files, dynamic array formulas, Power Query and Power Pivot, What-If Analysis, Scenario Manager, Solver, and a light introduction to macros/VBA. You have no pre-written curriculum — every explanation is generated fresh for exactly what's asked.
 
 Rules:
 - Be conversational, concrete, and example-driven. Short paragraphs, no filler, no long intros.
@@ -87,6 +87,21 @@ const SKILL_TREE = [
       { id: 'power-query', name: 'Intro to Power Query' },
     ],
   },
+  {
+    unit: 'Mastery',
+    level: 'mastery',
+    topics: [
+      { id: 'consolidate', name: 'Consolidate data (multiple sheets/files)' },
+      { id: 'dynamic-arrays', name: 'Dynamic arrays (FILTER, SORT, UNIQUE)' },
+      { id: 'advanced-pivot', name: 'Advanced PivotTables (slicers, calc fields)' },
+      { id: 'what-if', name: 'What-If Analysis (Goal Seek, Data Tables)' },
+      { id: 'scenario-solver', name: 'Scenario Manager & Solver' },
+      { id: 'power-query-advanced', name: 'Power Query: merge & transform' },
+      { id: 'power-pivot', name: 'Power Pivot & the Data Model' },
+      { id: 'macros-vba', name: 'Intro to macros & VBA' },
+      { id: 'auditing-protection', name: 'Auditing formulas & protecting workbooks' },
+    ],
+  },
 ];
 
 const COL_LETTERS = ['A', 'B', 'C', 'D', 'E'];
@@ -152,10 +167,21 @@ function allTopics() {
 }
 
 function computeLevel() {
-  const beginnerTopics = allTopics().filter((t) => t.level === 'beginner');
-  const doneBeginner = beginnerTopics.filter((t) => state.progress.completed.includes(t.id)).length;
-  return doneBeginner >= Math.ceil(beginnerTopics.length * 0.6) ? 'intermediate' : 'beginner';
+  const byLevel = { beginner: [], intermediate: [], mastery: [] };
+  allTopics().forEach((t) => byLevel[t.level]?.push(t));
+  const doneCount = (arr) => arr.filter((t) => state.progress.completed.includes(t.id)).length;
+  const beginnerDone = doneCount(byLevel.beginner);
+  const intermediateDone = doneCount(byLevel.intermediate);
+
+  const beginnerCleared = beginnerDone >= Math.ceil(byLevel.beginner.length * 0.6);
+  const intermediateCleared = intermediateDone >= Math.ceil(byLevel.intermediate.length * 0.6);
+
+  if (beginnerCleared && intermediateCleared) return 'mastery';
+  if (beginnerCleared) return 'intermediate';
+  return 'beginner';
 }
+
+const LEVEL_LABELS = { beginner: 'Beginner', intermediate: 'Intermediate', mastery: 'Mastery' };
 
 function buildLearnerContextMessage() {
   const level = computeLevel();
@@ -307,7 +333,7 @@ function switchTab(name) {
 
 function updateHeader() {
   const level = computeLevel();
-  levelPill.textContent = level === 'intermediate' ? 'Intermediate' : 'Beginner';
+  levelPill.textContent = LEVEL_LABELS[level] || 'Beginner';
   if (state.currentTab === 'learn') {
     cellRef.textContent = 'A1';
     breadcrumb.textContent = 'Learn > Pick a topic to start';
