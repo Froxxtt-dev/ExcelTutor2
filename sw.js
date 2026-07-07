@@ -1,4 +1,4 @@
-const CACHE_NAME = 'excel-tutor-shell-v3';
+const CACHE_NAME = 'excel-tutor-shell-v4';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -27,22 +27,31 @@ self.addEventListener('activate', (event) => {
 
 // Network-first for the Groq API (live data), cache-first for the app shell.
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+  const req = event.request;
+  const url = new URL(req.url);
 
-  if (url.origin.includes('api.groq.com')) {
-    // Never cache live tutoring calls — always hit the network.
-    event.respondWith(fetch(event.request));
+  // Only ever handle plain http(s) GET requests. Browser extensions (chrome-extension://),
+  // POST/streaming calls, and other schemes should pass straight through untouched —
+  // the Cache API can't store them anyway, and trying to throws.
+  if (req.method !== 'GET' || !url.protocol.startsWith('http')) {
+    return; // let the browser handle it natively, no event.respondWith()
+  }
+
+  if (url.origin.includes('api.groq.com') || url.origin !== self.location.origin) {
+    // Never cache live tutoring calls or third-party CDNs (Chart.js, SheetJS, Google Fonts) —
+    // just pass them straight to the network.
+    event.respondWith(fetch(req));
     return;
   }
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
+    caches.match(req).then((cached) => {
       return (
         cached ||
-        fetch(event.request)
+        fetch(req)
           .then((response) => {
             const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => {});
             return response;
           })
           .catch(() => cached)
