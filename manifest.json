@@ -1,7 +1,7 @@
 {
   "name": "Excel Tutor — Live Coach",
   "short_name": "Excel Tutor",
-  "description": "A live, AI-powered Excel coach that teaches you from beginner to intermediate — no canned lessons, every explanation generated on the spot.",
+  "description": "A live, AI-powered Excel coach that teaches you from beginner all the way to mastery — no canned lessons, every explanation generated on the spot.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,7 +9,17 @@
   "theme_color": "#1E5F4A",
   "orientation": "portrait-primary",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
