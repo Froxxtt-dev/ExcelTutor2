@@ -1,4 +1,4 @@
-const CACHE_NAME = 'excel-tutor-shell-v4';
+const CACHE_NAME = 'excel-tutor-shell-v5';
 const SHELL_FILES = [
   './',
   './index.html',
